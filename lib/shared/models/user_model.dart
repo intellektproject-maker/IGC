@@ -1,5 +1,6 @@
 import '../../core/enums/account_status.dart';
 import '../../core/enums/user_role.dart';
+import '../../core/rbac/role.dart';
 
 class UserModel {
   final String id;
@@ -7,7 +8,14 @@ class UserModel {
   final String fullName;
   final String email;
   final String? phone;
+
+  /// Main platform role
   final UserRole role;
+
+  /// Student leadership role
+  /// Ignored for Prodigy, Industry, College and Admin
+  final StudentRole studentRole;
+
   final AccountStatus accountStatus;
   final bool emailVerified;
   final String? profileImage;
@@ -21,6 +29,7 @@ class UserModel {
     required this.email,
     this.phone,
     required this.role,
+    this.studentRole = StudentRole.student,
     required this.accountStatus,
     required this.emailVerified,
     this.profileImage,
@@ -35,6 +44,7 @@ class UserModel {
     String? email,
     String? phone,
     UserRole? role,
+    StudentRole? studentRole,
     AccountStatus? accountStatus,
     bool? emailVerified,
     String? profileImage,
@@ -48,6 +58,7 @@ class UserModel {
       email: email ?? this.email,
       phone: phone ?? this.phone,
       role: role ?? this.role,
+      studentRole: studentRole ?? this.studentRole,
       accountStatus: accountStatus ?? this.accountStatus,
       emailVerified: emailVerified ?? this.emailVerified,
       profileImage: profileImage ?? this.profileImage,
@@ -64,6 +75,7 @@ class UserModel {
       email: json['email'],
       phone: json['phone'],
       role: UserRole.fromString(json['role']),
+      studentRole: parseStudentRole(json['studentRole']),
       accountStatus: AccountStatus.fromString(json['accountStatus']),
       emailVerified: json['emailVerified'],
       profileImage: json['profileImage'],
@@ -82,6 +94,7 @@ class UserModel {
       'email': email,
       'phone': phone,
       'role': role.value,
+      'studentRole': studentRole.apiValue,
       'accountStatus': accountStatus.value,
       'emailVerified': emailVerified,
       'profileImage': profileImage,
@@ -95,7 +108,8 @@ class UserModel {
     return 'UserModel('
         'businessCode: $businessCode, '
         'fullName: $fullName, '
-        'role: ${role.value})';
+        'role: ${role.value}, '
+        'studentRole: ${studentRole.apiValue})';
   }
 
   @override

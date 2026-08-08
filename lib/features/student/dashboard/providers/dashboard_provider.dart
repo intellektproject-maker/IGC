@@ -1,40 +1,16 @@
-import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../models/dashboard_model.dart';
+import '../models/student_dashboard_model.dart';
 import '../repositories/dashboard_repository.dart';
 
-class DashboardProvider extends ChangeNotifier {
-  DashboardProvider({
-    DashboardRepository? repository,
-  }) : _repository = repository ?? const DashboardRepository();
+/// Repository Provider
+final dashboardRepositoryProvider = Provider<DashboardRepository>((ref) {
+  return MockDashboardRepository();
+});
 
-  final DashboardRepository _repository;
+/// Dashboard Provider
+final dashboardProvider = FutureProvider<StudentDashboardModel>((ref) async {
+  final repository = ref.watch(dashboardRepositoryProvider);
 
-  DashboardModel? _dashboard;
-
-  DashboardModel? get dashboard => _dashboard;
-
-  bool _isLoading = false;
-
-  bool get isLoading => _isLoading;
-
-  String? _error;
-
-  String? get error => _error;
-
-  Future<void> loadDashboard() async {
-    try {
-      _isLoading = true;
-      _error = null;
-
-      notifyListeners();
-
-      _dashboard = await _repository.getDashboard();
-    } catch (e) {
-      _error = e.toString();
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
-}
+  return repository.getDashboard();
+});

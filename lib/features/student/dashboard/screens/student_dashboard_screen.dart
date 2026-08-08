@@ -1,171 +1,147 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/design_system/design_system.dart';
+import 'package:go_router/go_router.dart';
 
-import '../widgets/top_navigation/student_top_navigation.dart';
-import '../widgets/welcome/student_welcome_card.dart';
-import '../widgets/stats/student_stats_section.dart';
-import '../widgets/mission/student_today_mission_section.dart';
-import '../widgets/progress/student_progress_section.dart';
-import '../widgets/activities/student_recent_activities_section.dart';
-import '../widgets/events/student_upcoming_events_section.dart';
-import '../widgets/mentor/student_mentor_banner.dart';
-import '../widgets/connections/student_connections_section.dart';
-import '../widgets/quick_links/student_quick_links_section.dart';
-import '../widgets/recommended/student_recommended_section.dart';
+import '../../../../core/constants/route_names.dart';
 
-class StudentDashboardScreen extends StatelessWidget {
+import '../providers/dashboard_provider.dart';
+import '../widgets/bottom_navigation.dart';
+import '../widgets/dashboard_body.dart';
+import '../widgets/dashboard_header.dart';
+import '../widgets/student_drawer.dart';
+
+class StudentDashboardScreen extends ConsumerStatefulWidget {
   const StudentDashboardScreen({super.key});
 
   @override
+  ConsumerState<StudentDashboardScreen> createState() =>
+      _StudentDashboardScreenState();
+}
+
+class _StudentDashboardScreenState
+    extends ConsumerState<StudentDashboardScreen> {
+  final GlobalKey<ScaffoldState> _scaffoldKey =
+  GlobalKey<ScaffoldState>();
+
+  @override
   Widget build(BuildContext context) {
-    final bool isMobile = MediaQuery.of(context).size.width < 768;
+    final dashboard = ref.watch(dashboardProvider);
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.screenPadding),
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(
-                maxWidth: 1400,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // ==========================
-                  // Top Navigation
-                  // ==========================
-                  const StudentTopNavigation(),
-
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // ==========================
-                  // Welcome Banner
-                  // ==========================
-                  const StudentWelcomeCard(),
-
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // ==========================
-                  // Statistics
-                  // ==========================
-                  const StudentStatsSection(),
-
-                  const SizedBox(height: AppSpacing.lg),
-
-                  if (isMobile)
-                    const Column(
-                      children: [
-                        // Today's Mission
-                        StudentTodayMissionSection(),
-
-                        SizedBox(height: AppSpacing.lg),
-
-                        // Progress
-                        StudentProgressSection(),
-
-                        SizedBox(height: AppSpacing.lg),
-
-                        // Activities
-                        StudentRecentActivitiesSection(),
-
-                        SizedBox(height: AppSpacing.lg),
-
-                        // Events
-                        StudentUpcomingEventsSection(),
-
-                        SizedBox(height: AppSpacing.lg),
-
-                        // Mentor
-                        StudentMentorBanner(),
-
-                        SizedBox(height: AppSpacing.lg),
-
-                        // Connections
-                        StudentConnectionsSection(),
-
-                        SizedBox(height: AppSpacing.lg),
-
-                        // Quick Links
-                        StudentQuickLinksSection(),
-
-                        SizedBox(height: AppSpacing.lg),
-
-                        // Recommended
-                        StudentRecommendedSection(),
-                      ],
-                    )
-                  else
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        // ==========================
-                        // LEFT SIDE
-                        // ==========================
-                        const Expanded(
-                          flex: 3,
-                          child: Column(
-                            children: [
-                              // Today's Mission
-                              StudentTodayMissionSection(),
-
-                              SizedBox(height: AppSpacing.lg),
-
-                              // Progress
-                              StudentProgressSection(),
-
-                              SizedBox(height: AppSpacing.lg),
-
-                              // Activities
-                              StudentRecentActivitiesSection(),
-
-                              SizedBox(height: AppSpacing.lg),
-
-                              // Recommended
-                              StudentRecommendedSection(),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(width: AppSpacing.lg),
-
-                        // ==========================
-                        // RIGHT SIDE
-                        // ==========================
-                        const Expanded(
-                          flex: 1,
-                          child: Column(
-                            children: [
-                              // Events
-                              StudentUpcomingEventsSection(),
-
-                              SizedBox(height: AppSpacing.lg),
-
-                              // Mentor
-                              StudentMentorBanner(),
-
-                              SizedBox(height: AppSpacing.lg),
-
-                              // Connections
-                              StudentConnectionsSection(),
-
-                              SizedBox(height: AppSpacing.lg),
-
-                              // Quick Links
-                              StudentQuickLinksSection(),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                ],
-              ),
-            ),
+    return dashboard.when(
+      loading: () => const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ),
+      error: (error, stackTrace) => Scaffold(
+        body: Center(
+          child: Text(
+            'Error: $error',
           ),
         ),
       ),
+      data: (student) {
+        return Scaffold(
+          key: _scaffoldKey,
+          drawer: const StudentDrawer(),
+          backgroundColor: const Color(0xFFF5F7FB),
+
+          body: Stack(
+            children: [
+              /// ===========================
+              /// Premium Gradient Background
+              /// ===========================
+              Positioned.fill(
+                child: Column(
+                  children: [
+                    Container(
+                      height: 804,
+                      decoration: const BoxDecoration(
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Color(0xFF000351),
+                            Color(0xFF1A237E),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    Expanded(
+                      child: Container(
+                        color: const Color(0xFFF5F7FB),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              /// ===========================
+              /// Dashboard Content
+              /// ===========================
+              Positioned.fill(
+                child: DashboardBody(
+                  student: student,
+                ),
+              ),
+
+              /// ===========================
+              /// Header
+              /// ===========================
+              Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: SafeArea(
+                  bottom: false,
+                  child: DashboardHeader(
+                    studentPoints: student.score,
+                    onMenuTap: () {
+                      _scaffoldKey.currentState?.openDrawer();
+                    },
+                  ),
+                ),
+              ),
+            ],
+          ),
+
+          bottomNavigationBar: StudentBottomNavigation(
+            currentIndex: 0,
+            onTap: (index) {
+              switch (index) {
+                case 0:
+                  break;
+
+                case 1:
+                  context.push(RouteNames.learn);
+                  break;
+
+                case 2:
+                  context.push(RouteNames.innovate);
+                  break;
+
+                case 3:
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Events module coming soon"),
+                    ),
+                  );
+                  break;
+
+                case 4:
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text("Meetings module coming soon"),
+                    ),
+                  );
+                  break;
+              }
+            },
+          ),
+        );
+      },
     );
   }
 }
