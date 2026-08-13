@@ -1,31 +1,16 @@
 class ChallengeModel {
   final String id;
-
   final String title;
-
   final String description;
-
   final String category;
-
-  /// open
-  /// ongoing
-  /// completed
   final String status;
-
   final int xp;
-
   final DateTime startDate;
-
   final DateTime endDate;
-
   final int participants;
-
   final String difficulty;
-
   final String image;
-
   final bool featured;
-
   final bool joined;
 
   const ChallengeModel({
@@ -48,41 +33,41 @@ class ChallengeModel {
       Map<String, dynamic> json,
       ) {
     return ChallengeModel(
-      id: json["id"],
-      title: json["title"],
-      description: json["description"],
-      category: json["category"],
-      status: json["status"],
-      xp: json["xp"],
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      category: json['category'] as String,
+      status: json['status'] as String,
+      xp: json['xp'] as int,
       startDate: DateTime.parse(
-        json["startDate"],
+        json['startDate'] as String,
       ),
       endDate: DateTime.parse(
-        json["endDate"],
+        json['endDate'] as String,
       ),
-      participants: json["participants"],
-      difficulty: json["difficulty"],
-      image: json["image"],
-      featured: json["featured"],
-      joined: json["joined"],
+      participants: json['participants'] as int,
+      difficulty: json['difficulty'] as String,
+      image: json['image'] as String,
+      featured: json['featured'] as bool,
+      joined: json['joined'] as bool,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
-      "title": title,
-      "description": description,
-      "category": category,
-      "status": status,
-      "xp": xp,
-      "startDate": startDate.toIso8601String(),
-      "endDate": endDate.toIso8601String(),
-      "participants": participants,
-      "difficulty": difficulty,
-      "image": image,
-      "featured": featured,
-      "joined": joined,
+      'id': id,
+      'title': title,
+      'description': description,
+      'category': category,
+      'status': status,
+      'xp': xp,
+      'startDate': startDate.toIso8601String(),
+      'endDate': endDate.toIso8601String(),
+      'participants': participants,
+      'difficulty': difficulty,
+      'image': image,
+      'featured': featured,
+      'joined': joined,
     };
   }
 

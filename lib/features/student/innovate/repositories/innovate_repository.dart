@@ -6,9 +6,21 @@ import '../models/idea_model.dart';
 class InnovateRepository {
   const InnovateRepository();
 
-  //=========================================
-  // Featured Challenge
-  //=========================================
+  // ==========================================================
+  // REGISTERED STUDENT
+  // ==========================================================
+
+  Future<String> getRegisteredStudentName() async {
+    await Future.delayed(
+      const Duration(milliseconds: 100),
+    );
+
+    return InnovateMockData.registeredStudentName;
+  }
+
+  // ==========================================================
+  // FEATURED CHALLENGE
+  // ==========================================================
 
   Future<ChallengeModel?> getFeaturedChallenge() async {
     await Future.delayed(
@@ -16,87 +28,407 @@ class InnovateRepository {
     );
 
     try {
-      return InnovateMockData.challenges.firstWhere(
+      final challenge =
+      InnovateMockData.challenges.firstWhere(
             (challenge) => challenge.featured,
+      );
+
+      return _withJoinedState(
+        challenge,
       );
     } catch (_) {
       return null;
     }
   }
 
-  //=========================================
-  // All Challenges
-  //=========================================
+  // ==========================================================
+  // ALL CHALLENGES
+  // ==========================================================
 
   Future<List<ChallengeModel>> getChallenges() async {
     await Future.delayed(
       const Duration(milliseconds: 300),
     );
 
-    return InnovateMockData.challenges;
+    return InnovateMockData.challenges
+        .map(
+          (challenge) =>
+          _withJoinedState(challenge),
+    )
+        .toList();
   }
 
-  //=========================================
-  // My Ideas
-  //=========================================
+  // ==========================================================
+  // APPLY JOINED STATE
+  // ==========================================================
+
+  ChallengeModel _withJoinedState(
+      ChallengeModel challenge,
+      ) {
+    return challenge.copyWith(
+      joined: InnovateMockData
+          .joinedChallengeIds
+          .contains(challenge.id),
+    );
+  }
+
+  // ==========================================================
+  // MY IDEAS
+  // ==========================================================
 
   Future<List<IdeaModel>> getIdeas() async {
     await Future.delayed(
       const Duration(milliseconds: 300),
     );
 
-    return InnovateMockData.ideas;
+    return List<IdeaModel>.from(
+      InnovateMockData.ideas,
+    );
   }
 
-  //=========================================
-  // Upcoming Events
-  //=========================================
+  // ==========================================================
+  // SUBMIT IDEA
+  // ==========================================================
+
+  Future<IdeaModel> submitIdea({
+    required String title,
+    required String description,
+    required String domain,
+  }) async {
+    await Future.delayed(
+      const Duration(milliseconds: 500),
+    );
+
+    final cleanTitle =
+    title.trim();
+
+    final cleanDescription =
+    description.trim();
+
+    final cleanDomain =
+    domain.trim();
+
+    if (cleanTitle.isEmpty) {
+      throw Exception(
+        'Idea title is required.',
+      );
+    }
+
+    if (cleanDescription.isEmpty) {
+      throw Exception(
+        'Idea description is required.',
+      );
+    }
+
+    if (cleanDomain.isEmpty) {
+      throw Exception(
+        'Idea domain is required.',
+      );
+    }
+
+    final idea = IdeaModel(
+      id:
+      'IDEA-${DateTime.now().millisecondsSinceEpoch}',
+      title: cleanTitle,
+      description: cleanDescription,
+      domain: cleanDomain,
+      status: 'under_review',
+      submittedDate: DateTime.now(),
+      points: 0,
+      shortlisted: false,
+    );
+
+    InnovateMockData.ideas.insert(
+      0,
+      idea,
+    );
+
+    return idea;
+  }
+
+  // ==========================================================
+  // PARTICIPATE IN CHALLENGE
+  // ==========================================================
+
+  Future<bool> participateInChallenge({
+    required String challengeId,
+    required String fullName,
+    required String studentId,
+    required String institution,
+    required String course,
+    required String year,
+    required String email,
+    required String phone,
+  }) async {
+    await Future.delayed(
+      const Duration(milliseconds: 700),
+    );
+
+    // ========================================================
+    // CLEAN VALUES
+    // ========================================================
+
+    final cleanName =
+    fullName.trim();
+
+    final cleanStudentId =
+    studentId.trim();
+
+    final cleanInstitution =
+    institution.trim();
+
+    final cleanCourse =
+    course.trim();
+
+    final cleanYear =
+    year.trim();
+
+    final cleanEmail =
+    email.trim();
+
+    final cleanPhone =
+    phone.trim();
+
+    // ========================================================
+    // NAME
+    // ========================================================
+
+    if (cleanName.isEmpty) {
+      return false;
+    }
+
+    if (!RegExp(
+      r'^[a-zA-Z ]+$',
+    ).hasMatch(cleanName)) {
+      return false;
+    }
+
+    // ========================================================
+    // IGC REGISTERED NAME
+    // ========================================================
+
+    final registeredName =
+    InnovateMockData
+        .registeredStudentName
+        .trim()
+        .toLowerCase();
+
+    if (cleanName.toLowerCase() !=
+        registeredName) {
+      return false;
+    }
+
+    // ========================================================
+    // STUDENT ID
+    // ========================================================
+
+    if (cleanStudentId.isEmpty) {
+      return false;
+    }
+
+    if (!RegExp(
+      r'^[a-zA-Z0-9]+$',
+    ).hasMatch(cleanStudentId)) {
+      return false;
+    }
+
+    // ========================================================
+    // INSTITUTION
+    // ========================================================
+
+    if (cleanInstitution.isEmpty) {
+      return false;
+    }
+
+    if (!RegExp(
+      r'^[a-zA-Z ]+$',
+    ).hasMatch(cleanInstitution)) {
+      return false;
+    }
+
+    // ========================================================
+    // COURSE
+    // ========================================================
+
+    if (cleanCourse.isEmpty) {
+      return false;
+    }
+
+    if (!RegExp(
+      r'^[a-zA-Z ]+$',
+    ).hasMatch(cleanCourse)) {
+      return false;
+    }
+
+    // ========================================================
+    // YEAR
+    // ========================================================
+
+    const validYears = [
+      '1st Year',
+      '2nd Year',
+      '3rd Year',
+      '4th Year',
+      '5th Year',
+    ];
+
+    if (!validYears.contains(
+      cleanYear,
+    )) {
+      return false;
+    }
+
+    // ========================================================
+    // EMAIL
+    // ========================================================
+
+    if (cleanEmail.isEmpty) {
+      return false;
+    }
+
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@'
+      r'[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
+
+    if (!emailRegex.hasMatch(
+      cleanEmail,
+    )) {
+      return false;
+    }
+
+    // ========================================================
+    // PHONE
+    // ========================================================
+
+    if (!RegExp(
+      r'^[6-9][0-9]{9}$',
+    ).hasMatch(cleanPhone)) {
+      return false;
+    }
+
+    // ========================================================
+    // FIND CHALLENGE
+    // ========================================================
+
+    final challenge =
+        InnovateMockData.challenges
+            .where(
+              (item) =>
+          item.id ==
+              challengeId,
+        )
+            .firstOrNull;
+
+    if (challenge == null) {
+      return false;
+    }
+
+    // ========================================================
+    // ALREADY JOINED THIS CHALLENGE
+    // ========================================================
+
+    if (InnovateMockData
+        .joinedChallengeIds
+        .contains(challengeId)) {
+      return false;
+    }
+
+    // ========================================================
+    // JOIN THIS CHALLENGE
+    // ========================================================
+
+    InnovateMockData
+        .joinedChallengeIds
+        .add(challengeId);
+
+    // ========================================================
+    // UPDATE PARTICIPANT COUNT
+    // ========================================================
+
+    final index =
+    InnovateMockData.challenges
+        .indexWhere(
+          (item) =>
+      item.id ==
+          challengeId,
+    );
+
+    if (index != -1) {
+      InnovateMockData.challenges[index] =
+          challenge.copyWith(
+            participants:
+            challenge.participants + 1,
+          );
+    }
+
+    return true;
+  }
+
+  // ==========================================================
+  // EVENTS
+  // ==========================================================
 
   Future<List<EventModel>> getEvents() async {
     await Future.delayed(
       const Duration(milliseconds: 300),
     );
 
-    return InnovateMockData.events;
+    return List<EventModel>.from(
+      InnovateMockData.events,
+    );
   }
 
-  //=========================================
-  // Dashboard Statistics
-  //=========================================
+  // ==========================================================
+  // STATISTICS
+  // ==========================================================
 
-  Future<Map<String, dynamic>> getStatistics() async {
+  Future<Map<String, dynamic>>
+  getStatistics() async {
     await Future.delayed(
       const Duration(milliseconds: 300),
     );
 
-    final challenges =
-        InnovateMockData.challenges;
-
     final ideas =
         InnovateMockData.ideas;
 
-    final joined = challenges
-        .where((c) => c.joined)
-        .length;
+    final joinedCount =
+        InnovateMockData
+            .joinedChallengeIds
+            .length;
 
-    final submittedIdeas = ideas.length;
-
-    final xp = challenges
-        .where((c) => c.joined)
+    // Calculate XP only from challenges
+    // actually joined by this student.
+    final xp =
+    InnovateMockData.challenges
+        .where(
+          (challenge) =>
+          InnovateMockData
+              .joinedChallengeIds
+              .contains(
+            challenge.id,
+          ),
+    )
         .fold<int>(
       0,
-          (sum, item) => sum + item.xp,
+          (sum, challenge) =>
+      sum + challenge.xp,
     );
 
-    final shortlisted = ideas
-        .where((i) => i.shortlisted)
-        .length;
+    final shortlisted =
+        ideas.where(
+              (idea) =>
+          idea.shortlisted,
+        ).length;
 
     return {
-      "joined": joined,
-      "ideas": submittedIdeas,
-      "xp": xp,
-      "shortlisted": shortlisted,
+      'joined': joinedCount,
+      'ideas': ideas.length,
+      'xp': xp,
+      'shortlisted': shortlisted,
+      'points':
+      InnovateMockData
+          .innovationPoints,
     };
   }
 }

@@ -19,7 +19,7 @@ class AuthMockData {
     MockUser(
       user: UserModel(
         id: '1',
-        businessCode: 'STD-2026-000001',
+        businessCode: 'STD-01',
         fullName: 'Arun Kumar',
         email: 'student@igc.com',
         phone: '9876543210',

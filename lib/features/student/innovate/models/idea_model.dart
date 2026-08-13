@@ -1,10 +1,7 @@
 class IdeaModel {
   final String id;
-
   final String title;
-
   final String description;
-
   final String domain;
 
   /// draft
@@ -16,9 +13,8 @@ class IdeaModel {
 
   final DateTime submittedDate;
 
-  final int likes;
-
-  final int comments;
+  /// Innovation points awarded for this idea.
+  final int points;
 
   final bool shortlisted;
 
@@ -29,8 +25,7 @@ class IdeaModel {
     required this.domain,
     required this.status,
     required this.submittedDate,
-    required this.likes,
-    required this.comments,
+    required this.points,
     required this.shortlisted,
   });
 
@@ -38,32 +33,30 @@ class IdeaModel {
       Map<String, dynamic> json,
       ) {
     return IdeaModel(
-      id: json["id"],
-      title: json["title"],
-      description: json["description"],
-      domain: json["domain"],
-      status: json["status"],
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      domain: json['domain'] as String,
+      status: json['status'] as String,
       submittedDate: DateTime.parse(
-        json["submittedDate"],
+        json['submittedDate'] as String,
       ),
-      likes: json["likes"],
-      comments: json["comments"],
-      shortlisted: json["shortlisted"],
+      points: json['points'] as int,
+      shortlisted: json['shortlisted'] as bool,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
-      "title": title,
-      "description": description,
-      "domain": domain,
-      "status": status,
-      "submittedDate":
+      'id': id,
+      'title': title,
+      'description': description,
+      'domain': domain,
+      'status': status,
+      'submittedDate':
       submittedDate.toIso8601String(),
-      "likes": likes,
-      "comments": comments,
-      "shortlisted": shortlisted,
+      'points': points,
+      'shortlisted': shortlisted,
     };
   }
 
@@ -74,8 +67,7 @@ class IdeaModel {
     String? domain,
     String? status,
     DateTime? submittedDate,
-    int? likes,
-    int? comments,
+    int? points,
     bool? shortlisted,
   }) {
     return IdeaModel(
@@ -86,8 +78,7 @@ class IdeaModel {
       status: status ?? this.status,
       submittedDate:
       submittedDate ?? this.submittedDate,
-      likes: likes ?? this.likes,
-      comments: comments ?? this.comments,
+      points: points ?? this.points,
       shortlisted:
       shortlisted ?? this.shortlisted,
     );

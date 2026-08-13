@@ -5,66 +5,128 @@ import '../models/event_model.dart';
 import '../models/idea_model.dart';
 import '../repositories/innovate_repository.dart';
 
-/// =======================================================
-/// Repository
-/// =======================================================
+// =======================================================
+// REPOSITORY
+// =======================================================
 
 final innovateRepositoryProvider =
 Provider<InnovateRepository>(
       (ref) => const InnovateRepository(),
 );
 
-/// =======================================================
-/// Featured Challenge
-/// =======================================================
+// =======================================================
+// REGISTERED STUDENT NAME
+// =======================================================
+
+final registeredStudentNameProvider =
+FutureProvider<String>((ref) async {
+  return ref
+      .read(innovateRepositoryProvider)
+      .getRegisteredStudentName();
+});
+
+// =======================================================
+// FEATURED CHALLENGE
+// =======================================================
 
 final featuredChallengeProvider =
-FutureProvider<ChallengeModel?>((ref) async {
-  return ref
-      .read(innovateRepositoryProvider)
-      .getFeaturedChallenge();
-});
+FutureProvider<ChallengeModel?>(
+      (ref) async {
+    return ref
+        .read(innovateRepositoryProvider)
+        .getFeaturedChallenge();
+  },
+);
 
-/// =======================================================
-/// Challenges
-/// =======================================================
+// =======================================================
+// CHALLENGES
+// =======================================================
 
 final challengesProvider =
-FutureProvider<List<ChallengeModel>>((ref) async {
-  return ref
-      .read(innovateRepositoryProvider)
-      .getChallenges();
-});
+FutureProvider<List<ChallengeModel>>(
+      (ref) async {
+    return ref
+        .read(innovateRepositoryProvider)
+        .getChallenges();
+  },
+);
 
-/// =======================================================
-/// Ideas
-/// =======================================================
+// =======================================================
+// IDEAS
+// =======================================================
 
 final ideasProvider =
-FutureProvider<List<IdeaModel>>((ref) async {
-  return ref
-      .read(innovateRepositoryProvider)
-      .getIdeas();
-});
+AsyncNotifierProvider<
+    IdeasNotifier,
+    List<IdeaModel>>(
+  IdeasNotifier.new,
+);
 
-/// =======================================================
-/// Events
-/// =======================================================
+class IdeasNotifier
+    extends AsyncNotifier<List<IdeaModel>> {
+
+  @override
+  Future<List<IdeaModel>> build() async {
+    return ref
+        .read(innovateRepositoryProvider)
+        .getIdeas();
+  }
+
+  // =====================================================
+  // SUBMIT IDEA
+  // =====================================================
+
+  Future<IdeaModel> submitIdea({
+    required String title,
+    required String description,
+    required String domain,
+  }) async {
+    final repository =
+    ref.read(
+      innovateRepositoryProvider,
+    );
+
+    final newIdea =
+    await repository.submitIdea(
+      title: title,
+      description: description,
+      domain: domain,
+    );
+
+    state = AsyncData(
+      await repository.getIdeas(),
+    );
+
+    ref.invalidate(
+      innovateStatisticsProvider,
+    );
+
+    return newIdea;
+  }
+}
+
+// =======================================================
+// EVENTS
+// =======================================================
 
 final eventsProvider =
-FutureProvider<List<EventModel>>((ref) async {
-  return ref
-      .read(innovateRepositoryProvider)
-      .getEvents();
-});
+FutureProvider<List<EventModel>>(
+      (ref) async {
+    return ref
+        .read(innovateRepositoryProvider)
+        .getEvents();
+  },
+);
 
-/// =======================================================
-/// Dashboard Statistics
-/// =======================================================
+// =======================================================
+// STATISTICS
+// =======================================================
 
 final innovateStatisticsProvider =
-FutureProvider<Map<String, dynamic>>((ref) async {
-  return ref
-      .read(innovateRepositoryProvider)
-      .getStatistics();
-});
+FutureProvider<Map<String, dynamic>>(
+      (ref) async {
+    return ref
+        .read(innovateRepositoryProvider)
+        .getStatistics();
+  },
+);

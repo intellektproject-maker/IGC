@@ -1,10 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/design_system/app_colors.dart';
-import '../../../../core/design_system/app_radius.dart';
-import '../../../../core/design_system/app_shadows.dart';
-import '../../../../core/design_system/app_spacing.dart';
-import '../../../../core/design_system/app_typography.dart';
 import '../models/idea_model.dart';
 
 class IdeaCard extends StatelessWidget {
@@ -15,165 +11,194 @@ class IdeaCard extends StatelessWidget {
     required this.idea,
   });
 
-  Color _statusColor() {
-    switch (idea.status) {
-      case "approved":
-        return Colors.green;
-
-      case "under_review":
-        return Colors.orange;
-
-      case "rejected":
-        return Colors.red;
-
-      default:
-        return AppColors.primary;
-    }
-  }
-
-  String _statusText() {
-    switch (idea.status) {
-      case "under_review":
-        return "Under Review";
-
-      case "approved":
-        return "Approved";
-
-      case "rejected":
-        return "Rejected";
-
-      case "submitted":
-        return "Submitted";
-
-      default:
-        return "Draft";
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
-    final statusColor = _statusColor();
-
     return Container(
+      width: double.infinity,
       margin: const EdgeInsets.only(
-        bottom: AppSpacing.md,
+        bottom: 14,
       ),
-      padding: const EdgeInsets.all(
-        AppSpacing.cardPadding,
-      ),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(
-          AppRadius.card,
-        ),
-        boxShadow: const [
-          AppShadows.small,
-        ],
+        borderRadius:
+        BorderRadius.circular(18),
       ),
       child: Column(
         crossAxisAlignment:
         CrossAxisAlignment.start,
         children: [
+          // ==================================================
+          // TITLE + STATUS
+          // ==================================================
 
           Row(
+            crossAxisAlignment:
+            CrossAxisAlignment.start,
             children: [
-
               Expanded(
                 child: Text(
                   idea.title,
-                  style: AppTypography.titleMedium.copyWith(
-                    fontWeight: FontWeight.bold,
+                  style:
+                  const TextStyle(
+                    fontSize: 17,
+                    fontWeight:
+                    FontWeight.bold,
+                    color: Colors.black87,
                   ),
                 ),
               ),
 
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: statusColor.withValues(
-                    alpha: 0.12,
-                  ),
-                  borderRadius: BorderRadius.circular(
-                    AppRadius.pill,
-                  ),
-                ),
-                child: Text(
-                  _statusText(),
-                  style: AppTypography.bodySmall.copyWith(
-                    color: statusColor,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+              const SizedBox(width: 8),
+
+              _statusBadge(
+                idea.status,
               ),
             ],
           ),
 
-          const SizedBox(
-            height: AppSpacing.sm,
-          ),
+          const SizedBox(height: 8),
+
+          // ==================================================
+          // DESCRIPTION
+          // ==================================================
 
           Text(
             idea.description,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+            maxLines: 2,
+            overflow:
+            TextOverflow.ellipsis,
+            style:
+            const TextStyle(
+              fontSize: 13,
+              color: Colors.grey,
             ),
           ),
 
-          const SizedBox(
-            height: AppSpacing.md,
-          ),
+          const SizedBox(height: 14),
+
+          // ==================================================
+          // DOMAIN + POINTS
+          // ==================================================
 
           Row(
             children: [
-
               const Icon(
-                Icons.lightbulb,
-                size: 18,
+                Icons.lightbulb_outline,
+                size: 17,
                 color: Colors.amber,
               ),
 
-              const SizedBox(width: 4),
+              const SizedBox(width: 6),
 
-              Text(
-                idea.domain,
-                style: AppTypography.bodySmall,
+              Expanded(
+                child: Text(
+                  idea.domain,
+                  style:
+                  const TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey,
+                  ),
+                ),
               ),
-
-              const Spacer(),
 
               const Icon(
-                Icons.thumb_up,
-                size: 18,
-                color: Colors.blue,
+                Icons.stars_outlined,
+                size: 17,
+                color: Colors.orange,
               ),
 
-              const SizedBox(width: 4),
+              const SizedBox(width: 5),
 
               Text(
-                "${idea.likes}",
-                style: AppTypography.bodySmall,
-              ),
-
-              const SizedBox(width: 16),
-
-              const Icon(
-                Icons.comment,
-                size: 18,
-                color: Colors.green,
-              ),
-
-              const SizedBox(width: 4),
-
-              Text(
-                "${idea.comments}",
-                style: AppTypography.bodySmall,
+                '+${idea.points} pts',
+                style:
+                const TextStyle(
+                  fontSize: 12,
+                  fontWeight:
+                  FontWeight.w600,
+                  color:
+                  AppColors.primary,
+                ),
               ),
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  // ================================================================
+  // STATUS
+  // ================================================================
+
+  Widget _statusBadge(
+      String status,
+      ) {
+    String text;
+    Color background;
+    Color foreground;
+
+    switch (status) {
+      case 'under_review':
+        text = 'Under Review';
+        background =
+            Colors.orange.shade50;
+        foreground =
+            Colors.orange.shade800;
+        break;
+
+      case 'submitted':
+        text = 'Submitted';
+        background =
+            Colors.blue.shade50;
+        foreground =
+            Colors.blue.shade800;
+        break;
+
+      case 'approved':
+        text = 'Approved';
+        background =
+            Colors.green.shade50;
+        foreground =
+            Colors.green.shade800;
+        break;
+
+      case 'rejected':
+        text = 'Rejected';
+        background =
+            Colors.red.shade50;
+        foreground =
+            Colors.red.shade800;
+        break;
+
+      default:
+        text = 'Draft';
+        background =
+            Colors.grey.shade100;
+        foreground =
+            Colors.grey.shade700;
+    }
+
+    return Container(
+      padding:
+      const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 5,
+      ),
+      decoration: BoxDecoration(
+        color: background,
+        borderRadius:
+        BorderRadius.circular(20),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 10,
+          fontWeight:
+          FontWeight.w600,
+          color: foreground,
+        ),
       ),
     );
   }
