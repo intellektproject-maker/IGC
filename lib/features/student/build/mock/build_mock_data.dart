@@ -6,18 +6,17 @@ import '../models/sprint_model.dart';
 class BuildMockData {
   BuildMockData._();
 
-  //=========================================================
-  // Product Sprints
-  //=========================================================
+  // ==========================================================
+  // SPRINTS
+  // ==========================================================
 
   static final List<SprintModel> sprints = [
-
     SprintModel(
-      id: "SPR-001",
-      title: "Smart Attendance System",
+      id: 'SPR-001',
+      title: 'Smart Attendance System',
       description:
-      "Develop an AI-powered attendance system using Flutter and Firebase.",
-      category: "Mobile App",
+      'Develop an AI-powered attendance system using Flutter and Firebase.',
+      category: 'Mobile App',
       sprintNumber: 2,
       totalSprints: 6,
       progress: 0.45,
@@ -30,11 +29,11 @@ class BuildMockData {
     ),
 
     SprintModel(
-      id: "SPR-002",
-      title: "Campus Navigation",
+      id: 'SPR-002',
+      title: 'Campus Navigation',
       description:
-      "Indoor navigation system using BLE and Flutter.",
-      category: "IoT",
+      'Indoor navigation system using BLE and Flutter.',
+      category: 'IoT',
       sprintNumber: 1,
       totalSprints: 5,
       progress: 0.20,
@@ -47,116 +46,116 @@ class BuildMockData {
     ),
   ];
 
-  //=========================================================
-  // Build Projects
-  //=========================================================
+  // ==========================================================
+  // PROJECTS
+  // ==========================================================
 
   static final List<BuildProjectModel> projects = [
-
     BuildProjectModel(
-      id: "PROJ-001",
-      title: "IGC Student Portal",
+      id: 'PROJ-001',
+
+      // REQUIRED BY BuildProjectModel
+      ideaId: 'IDEA-001',
+      challengeId: 'CH-001',
+      challengeTitle: 'Smart Campus Innovation Challenge',
+
+      title: 'Smart Attendance using AI',
+
       description:
-      "Cross-platform student application built using Flutter.",
-      technology: "Flutter",
-      status: "In Progress",
+      'Face recognition based attendance system.',
+
+      technology: 'Artificial Intelligence',
+
+      status: 'In Progress',
+
       completion: 65,
-      githubUrl: "https://github.com/intellektproject-maker/IGC",
-      featured: true,
-      createdAt: DateTime(2026, 6, 12),
-    ),
 
-    BuildProjectModel(
-      id: "PROJ-002",
-      title: "AI Attendance",
-      description:
-      "Face recognition attendance application.",
-      technology: "Python",
-      status: "Planning",
-      completion: 20,
-      githubUrl: "",
-      featured: false,
-      createdAt: DateTime(2026, 7, 2),
+      githubUrl:
+      'https://github.com/intellektproject-maker/IGC',
+
+      featured: true,
+
+      createdAt: DateTime(2026, 7, 15),
     ),
   ];
 
-  //=========================================================
-  // Milestones
-  //=========================================================
+  // ==========================================================
+  // MILESTONES
+  // ==========================================================
 
   static final List<MilestoneModel> milestones = [
-
     MilestoneModel(
-      id: "MILE-001",
-      title: "UI Design",
-      description: "Complete all application screens.",
+      id: 'MILE-001',
+      title: 'UI Design',
+      description:
+      'Complete all application screens.',
       completed: true,
       dueDate: DateTime(2026, 8, 8),
       xp: 100,
     ),
 
     MilestoneModel(
-      id: "MILE-002",
-      title: "API Integration",
-      description: "Connect Flutter with Railway backend.",
+      id: 'MILE-002',
+      title: 'API Integration',
+      description:
+      'Connect Flutter with backend.',
       completed: false,
       dueDate: DateTime(2026, 8, 18),
       xp: 200,
     ),
 
     MilestoneModel(
-      id: "MILE-003",
-      title: "Testing",
-      description: "Complete integration testing.",
+      id: 'MILE-003',
+      title: 'Testing',
+      description:
+      'Complete integration testing.',
       completed: false,
       dueDate: DateTime(2026, 8, 30),
       xp: 150,
     ),
   ];
 
-  //=========================================================
-  // Events
-  //=========================================================
+  // ==========================================================
+// EVENTS
+// ==========================================================
 
   static final List<BuildEventModel> events = [
-
     BuildEventModel(
-      id: "EVT-001",
-      title: "Flutter Sprint Workshop",
+      id: 'EVT-001',
+      title: 'Flutter Sprint Workshop',
       description:
-      "Build production Flutter applications.",
-      venue: "Innovation Lab",
+      'Build production Flutter applications.',
+      venue: 'Innovation Lab',
       eventDate: DateTime(2026, 8, 15),
-      organizer: "IGC",
-      type: "Workshop",
+      organizer: 'IGC',
+      type: 'Workshop',
       registered: true,
-      image: "",
+      image: '',
+
+      teamName: 'Code Warriors',
+
+      teamMembers: [
+        'Arun Kumar',
+        'Priya Sharma',
+        'Rahul Raj',
+      ],
     ),
 
     BuildEventModel(
-      id: "EVT-002",
-      title: "Demo Day",
+      id: 'EVT-002',
+      title: 'Demo Day',
       description:
-      "Present sprint progress before mentors.",
-      venue: "Conference Hall",
+      'Present sprint progress before mentors.',
+      venue: 'Conference Hall',
       eventDate: DateTime(2026, 9, 5),
-      organizer: "IGC",
-      type: "Presentation",
+      organizer: 'IGC',
+      type: 'Presentation',
       registered: false,
-      image: "",
-    ),
+      image: '',
 
-    BuildEventModel(
-      id: "EVT-003",
-      title: "Hackathon",
-      description:
-      "24-hour product building challenge.",
-      venue: "Main Auditorium",
-      eventDate: DateTime(2026, 9, 20),
-      organizer: "IGC",
-      type: "Hackathon",
-      registered: false,
-      image: "",
+      teamName: '',
+
+      teamMembers: [],
     ),
   ];
 }

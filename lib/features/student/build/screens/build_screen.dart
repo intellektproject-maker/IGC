@@ -20,15 +20,10 @@ class BuildScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final featuredSprint = ref.watch(featuredSprintProvider);
-
     final statistics = ref.watch(buildStatisticsProvider);
-
     final sprints = ref.watch(sprintsProvider);
-
     final milestones = ref.watch(milestonesProvider);
-
     final projects = ref.watch(buildProjectsProvider);
-
     final events = ref.watch(buildEventsProvider);
 
     return Scaffold(
@@ -40,189 +35,338 @@ class BuildScreen extends ConsumerWidget {
         foregroundColor: Colors.white,
         centerTitle: false,
         title: Text(
-          "Build",
-          style: AppTypography.titleLarge.copyWith(color: Colors.white),
+          'Build',
+          style: AppTypography.titleLarge.copyWith(
+            color: Colors.white,
+            fontWeight: FontWeight.w700,
+          ),
         ),
       ),
 
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(AppSpacing.screenPadding),
-
+          physics: const BouncingScrollPhysics(),
+          padding: const EdgeInsets.all(
+            AppSpacing.screenPadding,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-
             children: [
-              featuredSprint.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
 
-                error: (_, __) => const SizedBox(),
 
-                data: (sprint) {
-                  if (sprint == null) {
-                    return const SizedBox();
-                  }
 
-                  return FeaturedSprintCard(sprint: sprint);
-                },
-              ),
-
-              const SizedBox(height: AppSpacing.xl),
+              // =====================================================
+              // OVERVIEW
+              // =====================================================
 
               Text(
-                "Overview",
+                'Overview',
                 style: AppTypography.headlineMedium.copyWith(
                   color: Colors.white,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
 
-              const SizedBox(height: AppSpacing.md),
-              statistics.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
+              const SizedBox(
+                height: AppSpacing.md,
+              ),
 
-                error: (_, __) => const SizedBox(),
+              statistics.when(
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+
+                error: (error, stackTrace) {
+                  return const SizedBox.shrink();
+                },
 
                 data: (data) {
-                  return GridView.count(
-                    shrinkWrap: true,
-                    physics: const NeverScrollableScrollPhysics(),
-                    crossAxisCount: 2,
-                    crossAxisSpacing: AppSpacing.md,
-                    mainAxisSpacing: AppSpacing.md,
-                    childAspectRatio: 1.15,
+                  final activeSprints =
+                      data['activeSprints']?.toString() ?? '0';
 
-                    children: [
-                      BuildStatCard(
-                        title: "Active Sprints",
-                        value: data["activeSprints"].toString(),
-                        icon: Icons.rocket_launch,
-                        iconColor: Colors.blue,
-                      ),
+                  final milestonesCount =
+                      data['milestones']?.toString() ?? '0';
 
-                      BuildStatCard(
-                        title: "Milestones",
-                        value: data["milestones"].toString(),
-                        icon: Icons.flag,
-                        iconColor: Colors.orange,
-                      ),
+                  final xp =
+                      data['xp']?.toString() ?? '0';
 
-                      BuildStatCard(
-                        title: "XP Earned",
-                        value: data["xp"].toString(),
-                        icon: Icons.emoji_events,
-                        iconColor: Colors.amber,
-                      ),
+                  final teams =
+                      data['teams']?.toString() ?? '0';
 
-                      BuildStatCard(
-                        title: "Team Members",
-                        value: data["teams"].toString(),
-                        icon: Icons.groups,
-                        iconColor: Colors.green,
-                      ),
-                    ],
+                  return LayoutBuilder(
+                    builder: (context, constraints) {
+
+                      final double spacing = AppSpacing.md;
+
+                      // Keep two columns on phones/tablets.
+                      // Each card gets exactly half of the available width.
+                      final double cardWidth =
+                          (constraints.maxWidth - spacing) / 2;
+
+                      return GridView(
+                        shrinkWrap: true,
+                        physics:
+                        const NeverScrollableScrollPhysics(),
+
+                        gridDelegate:
+                        SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          crossAxisSpacing: spacing,
+                          mainAxisSpacing: spacing,
+
+                          // Aspect ratio is calculated from the
+                          // actual available width.
+                          childAspectRatio:
+                          cardWidth / 142,
+                        ),
+
+                        children: [
+                          BuildStatCard(
+                            title: 'Active Sprints',
+                            value: activeSprints,
+                            icon: Icons.rocket_launch,
+                            iconColor: Colors.blue,
+                          ),
+
+                          BuildStatCard(
+                            title: 'Milestones',
+                            value: milestonesCount,
+                            icon: Icons.flag,
+                            iconColor: Colors.orange,
+                          ),
+
+                          BuildStatCard(
+                            title: 'XP Earned',
+                            value: xp,
+                            icon: Icons.emoji_events,
+                            iconColor: Colors.amber,
+                          ),
+
+                          BuildStatCard(
+                            title: 'Team Members',
+                            value: teams,
+                            icon: Icons.groups,
+                            iconColor: Colors.green,
+                          ),
+                        ],
+                      );
+                    },
                   );
                 },
               ),
 
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(
+                height: AppSpacing.xl,
+              ),
+
+              // =====================================================
+              // PRODUCT SPRINTS
+              // =====================================================
 
               Text(
-                "Product Sprints",
+                'Product Sprints',
                 style: AppTypography.headlineMedium.copyWith(
                   color: Colors.white,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
 
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(
+                height: AppSpacing.md,
+              ),
 
               sprints.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
 
-                error: (_, __) => const SizedBox(),
+                error: (error, stackTrace) {
+                  return const SizedBox.shrink();
+                },
 
                 data: (sprintList) {
+                  if (sprintList.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+
                   return Column(
                     children: sprintList
-                        .map((sprint) => SprintCard(sprint: sprint))
+                        .map(
+                          (sprint) => SprintCard(
+                        sprint: sprint,
+                      ),
+                    )
                         .toList(),
                   );
                 },
               ),
 
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(
+                height: AppSpacing.xl,
+              ),
+
+              // =====================================================
+              // SPRINT MILESTONES
+              // =====================================================
 
               Text(
-                "Sprint Milestones",
+                'Sprint Milestones',
                 style: AppTypography.headlineMedium.copyWith(
                   color: Colors.white,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
 
-              const SizedBox(height: AppSpacing.md),
-              milestones.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
+              const SizedBox(
+                height: AppSpacing.md,
+              ),
 
-                error: (_, __) => const SizedBox(),
+              milestones.when(
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+
+                error: (error, stackTrace) {
+                  return const SizedBox.shrink();
+                },
 
                 data: (milestoneList) {
+                  if (milestoneList.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+
                   return Column(
                     children: milestoneList
-                        .map((milestone) => MilestoneCard(milestone: milestone))
+                        .map(
+                          (milestone) => MilestoneCard(
+                        milestone: milestone,
+                      ),
+                    )
                         .toList(),
                   );
                 },
               ),
 
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(
+                height: AppSpacing.xl,
+              ),
+
+              // =====================================================
+              // MY PROJECTS
+              // =====================================================
 
               Text(
-                "My Projects",
+                'My Projects',
                 style: AppTypography.headlineMedium.copyWith(
                   color: Colors.white,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
 
-              const SizedBox(height: AppSpacing.md),
+              const SizedBox(
+                height: AppSpacing.md,
+              ),
 
               projects.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
 
-                error: (_, __) => const SizedBox(),
+                error: (error, stackTrace) {
+                  return const SizedBox.shrink();
+                },
 
                 data: (projectList) {
+                  if (projectList.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+
                   return Column(
                     children: projectList
-                        .map((project) => BuildProjectCard(project: project))
+                        .map(
+                          (project) => BuildProjectCard(
+                        project: project,
+                      ),
+                    )
                         .toList(),
                   );
                 },
               ),
 
-              const SizedBox(height: AppSpacing.xl),
+              const SizedBox(
+                height: AppSpacing.xl,
+              ),
+
+              // =====================================================
+              // UPCOMING BUILD EVENTS
+              // =====================================================
 
               Text(
-                "Upcoming Build Events",
+                'Upcoming Build Events',
                 style: AppTypography.headlineMedium.copyWith(
                   color: Colors.white,
+                  fontWeight: FontWeight.w700,
                 ),
               ),
 
-              const SizedBox(height: AppSpacing.md),
-              events.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
+              const SizedBox(
+                height: AppSpacing.md,
+              ),
 
-                error: (_, __) => const SizedBox(),
+              events.when(
+                loading: () => const Center(
+                  child: Padding(
+                    padding: EdgeInsets.all(24),
+                    child: CircularProgressIndicator(
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+
+                error: (error, stackTrace) {
+                  return const SizedBox.shrink();
+                },
 
                 data: (eventList) {
+                  if (eventList.isEmpty) {
+                    return const SizedBox.shrink();
+                  }
+
                   return Column(
                     children: eventList
-                        .map((event) => BuildEventCard(event: event))
+                        .map(
+                          (event) => BuildEventCard(
+                        event: event,
+                      ),
+                    )
                         .toList(),
                   );
                 },
               ),
 
-              const SizedBox(height: AppSpacing.xxl),
+              const SizedBox(
+                height: AppSpacing.xxl,
+              ),
             ],
           ),
         ),

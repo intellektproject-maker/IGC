@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/design_system/app_colors.dart';
 import '../../../../core/design_system/app_radius.dart';
 import '../../../../core/design_system/app_shadows.dart';
-import '../../../../core/design_system/app_spacing.dart';
 import '../../../../core/design_system/app_typography.dart';
 
 class BuildStatCard extends StatelessWidget {
@@ -23,9 +22,7 @@ class BuildStatCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(
-        AppSpacing.cardPadding,
-      ),
+      width: double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(
@@ -35,42 +32,74 @@ class BuildStatCard extends StatelessWidget {
           AppShadows.small,
         ],
       ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 12,
+        vertical: 12,
+      ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
 
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: iconColor.withValues(
-              alpha: 0.12,
+          // =====================================================
+          // ICON
+          // =====================================================
+
+          Container(
+            width: 42,
+            height: 42,
+            decoration: BoxDecoration(
+              color: iconColor.withValues(
+                alpha: 0.10,
+              ),
+              shape: BoxShape.circle,
             ),
             child: Icon(
               icon,
+              size: 21,
               color: iconColor,
-              size: 24,
             ),
           ),
 
           const SizedBox(
-            height: AppSpacing.md,
+            height: 8,
           ),
 
-          Text(
-            value,
-            style: AppTypography.headlineMedium.copyWith(
-              fontWeight: FontWeight.bold,
+          // =====================================================
+          // VALUE
+          // =====================================================
+
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            child: Text(
+              value,
+              maxLines: 1,
+              style: AppTypography.titleLarge.copyWith(
+                fontWeight: FontWeight.w800,
+                color: Colors.black87,
+              ),
             ),
           ),
 
           const SizedBox(
-            height: AppSpacing.xs,
+            height: 3,
           ),
 
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
+          // =====================================================
+          // TITLE
+          // =====================================================
+
+          Flexible(
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                title,
+                maxLines: 1,
+                textAlign: TextAlign.center,
+                style: AppTypography.bodySmall.copyWith(
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
             ),
           ),
         ],

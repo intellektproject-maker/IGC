@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
 import 'package:go_router/go_router.dart';
 
 import '../../../../core/constants/route_names.dart';
@@ -29,67 +28,95 @@ class _StudentDashboardScreenState
     final dashboard = ref.watch(dashboardProvider);
 
     return dashboard.when(
-      loading: () => const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      ),
-      error: (error, stackTrace) => Scaffold(
-        body: Center(
-          child: Text(
-            'Error: $error',
+      // =========================================================
+      // LOADING
+      // =========================================================
+      loading: () {
+        return const Scaffold(
+          backgroundColor: Color(0xFF000351),
+          body: Center(
+            child: CircularProgressIndicator(),
           ),
-        ),
-      ),
+        );
+      },
+
+      // =========================================================
+      // ERROR
+      // =========================================================
+      error: (error, stackTrace) {
+        return Scaffold(
+          backgroundColor: const Color(0xFF000351),
+          body: Center(
+            child: Padding(
+              padding: const EdgeInsets.all(24),
+              child: Text(
+                'Error: $error',
+                textAlign: TextAlign.center,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 15,
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+
+      // =========================================================
+      // DATA
+      // =========================================================
       data: (student) {
         return Scaffold(
           key: _scaffoldKey,
-          drawer: const StudentDrawer(),
-          backgroundColor: const Color(0xFFF5F7FB),
 
+          // -----------------------------------------------------
+          // DRAWER
+          // -----------------------------------------------------
+          drawer: const StudentDrawer(),
+
+          // -----------------------------------------------------
+          // BACKGROUND
+          // -----------------------------------------------------
+          backgroundColor: const Color(0xFF000351),
+
+          // -----------------------------------------------------
+          // BODY
+          // -----------------------------------------------------
           body: Stack(
             children: [
-              /// ===========================
-              /// Premium Gradient Background
-              /// ===========================
+              // =================================================
+              // FULL SCREEN GRADIENT BACKGROUND
+              // =================================================
               Positioned.fill(
-                child: Column(
-                  children: [
-                    Container(
-                      height: 804,
-                      decoration: const BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color(0xFF000351),
-                            Color(0xFF1A237E),
-                          ],
-                        ),
-                      ),
+                child: DecoratedBox(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Color(0xFF000351),
+                        Color(0xFF1A237E),
+                      ],
                     ),
-
-                    Expanded(
-                      child: Container(
-                        color: const Color(0xFFF5F7FB),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ),
 
-              /// ===========================
-              /// Dashboard Content
-              /// ===========================
+              // =================================================
+              // DASHBOARD CONTENT
+              // =================================================
               Positioned.fill(
-                child: DashboardBody(
-                  student: student,
+                child: SafeArea(
+                  bottom: false,
+                  child: DashboardBody(
+                    student: student,
+                  ),
                 ),
               ),
 
-              /// ===========================
-              /// Header
-              /// ===========================
+              // =================================================
+              // HEADER
+              // =================================================
               Positioned(
                 top: 0,
                 left: 0,
@@ -107,33 +134,59 @@ class _StudentDashboardScreenState
             ],
           ),
 
+          // =====================================================
+          // BOTTOM NAVIGATION
+          // =====================================================
           bottomNavigationBar: StudentBottomNavigation(
             currentIndex: 0,
             onTap: (index) {
               switch (index) {
+              // -----------------------------------------------
+              // DASHBOARD
+              // -----------------------------------------------
                 case 0:
                   break;
 
+              // -----------------------------------------------
+              // LEARN
+              // -----------------------------------------------
                 case 1:
-                  context.push(RouteNames.learn);
+                  context.push(
+                    RouteNames.learn,
+                  );
                   break;
 
+              // -----------------------------------------------
+              // INNOVATION
+              // -----------------------------------------------
                 case 2:
-                  context.push(RouteNames.innovate);
+                  context.push(
+                    RouteNames.innovate,
+                  );
                   break;
 
+              // -----------------------------------------------
+              // EVENTS
+              // -----------------------------------------------
                 case 3:
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text("Events module coming soon"),
+                      content: Text(
+                        'Events module coming soon',
+                      ),
                     ),
                   );
                   break;
 
+              // -----------------------------------------------
+              // MEETINGS
+              // -----------------------------------------------
                 case 4:
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
-                      content: Text("Meetings module coming soon"),
+                      content: Text(
+                        'Meetings module coming soon',
+                      ),
                     ),
                   );
                   break;

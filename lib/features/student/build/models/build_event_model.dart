@@ -17,6 +17,12 @@ class BuildEventModel {
 
   final String image;
 
+  /// Name of the registered team.
+  final String teamName;
+
+  /// Names of all team members.
+  final List<String> teamMembers;
+
   const BuildEventModel({
     required this.id,
     required this.title,
@@ -27,37 +33,47 @@ class BuildEventModel {
     required this.type,
     required this.registered,
     required this.image,
+    required this.teamName,
+    required this.teamMembers,
   });
 
   factory BuildEventModel.fromJson(
       Map<String, dynamic> json,
       ) {
     return BuildEventModel(
-      id: json["id"],
-      title: json["title"],
-      description: json["description"],
-      venue: json["venue"],
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      venue: json['venue'] as String,
       eventDate: DateTime.parse(
-        json["eventDate"],
+        json['eventDate'] as String,
       ),
-      organizer: json["organizer"],
-      type: json["type"],
-      registered: json["registered"],
-      image: json["image"],
+      organizer: json['organizer'] as String,
+      type: json['type'] as String,
+      registered: json['registered'] as bool? ?? false,
+      image: json['image'] as String? ?? '',
+      teamName: json['teamName'] as String? ?? '',
+      teamMembers:
+      (json['teamMembers'] as List<dynamic>?)
+          ?.map((member) => member.toString())
+          .toList() ??
+          [],
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
-      "title": title,
-      "description": description,
-      "venue": venue,
-      "eventDate": eventDate.toIso8601String(),
-      "organizer": organizer,
-      "type": type,
-      "registered": registered,
-      "image": image,
+      'id': id,
+      'title': title,
+      'description': description,
+      'venue': venue,
+      'eventDate': eventDate.toIso8601String(),
+      'organizer': organizer,
+      'type': type,
+      'registered': registered,
+      'image': image,
+      'teamName': teamName,
+      'teamMembers': teamMembers,
     };
   }
 
@@ -71,6 +87,8 @@ class BuildEventModel {
     String? type,
     bool? registered,
     String? image,
+    String? teamName,
+    List<String>? teamMembers,
   }) {
     return BuildEventModel(
       id: id ?? this.id,
@@ -82,6 +100,8 @@ class BuildEventModel {
       type: type ?? this.type,
       registered: registered ?? this.registered,
       image: image ?? this.image,
+      teamName: teamName ?? this.teamName,
+      teamMembers: teamMembers ?? this.teamMembers,
     );
   }
 }

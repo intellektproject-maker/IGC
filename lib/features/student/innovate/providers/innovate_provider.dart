@@ -15,7 +15,7 @@ Provider<InnovateRepository>(
 );
 
 // =======================================================
-// REGISTERED STUDENT NAME
+// REGISTERED STUDENT
 // =======================================================
 
 final registeredStudentNameProvider =
@@ -56,9 +56,7 @@ FutureProvider<List<ChallengeModel>>(
 // =======================================================
 
 final ideasProvider =
-AsyncNotifierProvider<
-    IdeasNotifier,
-    List<IdeaModel>>(
+AsyncNotifierProvider<IdeasNotifier, List<IdeaModel>>(
   IdeasNotifier.new,
 );
 
@@ -76,32 +74,39 @@ class IdeasNotifier
   // SUBMIT IDEA
   // =====================================================
 
-  Future<IdeaModel> submitIdea({
+  Future<IdeaModel?> submitIdea({
+    required String challengeId,
     required String title,
     required String description,
     required String domain,
   }) async {
     final repository =
-    ref.read(
-      innovateRepositoryProvider,
-    );
+    ref.read(innovateRepositoryProvider);
 
-    final newIdea =
+    final idea =
     await repository.submitIdea(
+      challengeId: challengeId,
       title: title,
       description: description,
       domain: domain,
     );
 
+    if (idea == null) {
+      return null;
+    }
+
+    // IMPORTANT:
+    // Immediately refresh My Ideas.
     state = AsyncData(
       await repository.getIdeas(),
     );
 
+    // Refresh statistics.
     ref.invalidate(
       innovateStatisticsProvider,
     );
 
-    return newIdea;
+    return idea;
   }
 }
 

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import '../../../../core/design_system/app_colors.dart';
 import '../../../../core/design_system/app_radius.dart';
 import '../../../../core/design_system/app_shadows.dart';
-import '../../../../core/design_system/app_typography.dart';
 
 class AddIdeaCard extends StatelessWidget {
   final VoidCallback onTap;
@@ -37,7 +36,7 @@ class AddIdeaCard extends StatelessWidget {
           child: Row(
             children: [
               // ==================================================
-              // Plus Button
+              // PLUS ICON
               // ==================================================
 
               Container(
@@ -58,7 +57,7 @@ class AddIdeaCard extends StatelessWidget {
               const SizedBox(width: 14),
 
               // ==================================================
-              // Text
+              // TEXT
               // ==================================================
 
               const Expanded(
@@ -74,9 +73,7 @@ class AddIdeaCard extends StatelessWidget {
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-
                     SizedBox(height: 5),
-
                     Text(
                       'Share your innovation idea with IGC.',
                       style: TextStyle(
@@ -87,10 +84,6 @@ class AddIdeaCard extends StatelessWidget {
                   ],
                 ),
               ),
-
-              // ==================================================
-              // Arrow
-              // ==================================================
 
               const Icon(
                 Icons.chevron_right,

@@ -12,11 +12,23 @@ class StudentBottomNavigation extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final bottomInset = MediaQuery.of(context).padding.bottom;
+    final mediaQuery = MediaQuery.of(context);
+
+    final bottomInset = mediaQuery.padding.bottom;
+    final screenWidth = mediaQuery.size.width;
+
+    // Responsive navigation height.
+    final navigationHeight = screenWidth < 360
+        ? 72.0
+        : screenWidth < 600
+        ? 78.0
+        : 84.0;
 
     return Container(
-      height: 86 + bottomInset,
-      padding: EdgeInsets.only(bottom: bottomInset),
+      height: navigationHeight + bottomInset,
+      padding: EdgeInsets.only(
+        bottom: bottomInset,
+      ),
       decoration: const BoxDecoration(
         color: Color(0xFF000153),
         boxShadow: [
@@ -32,39 +44,43 @@ class StudentBottomNavigation extends StatelessWidget {
           Expanded(
             child: _NavItem(
               icon: Icons.home_rounded,
-              label: "Dashboard",
+              label: 'Dashboard',
               selected: currentIndex == 0,
               onTap: () => onTap(0),
             ),
           ),
+
           Expanded(
             child: _NavItem(
               icon: Icons.school_outlined,
-              label: "Learn",
+              label: 'Learn',
               selected: currentIndex == 1,
               onTap: () => onTap(1),
             ),
           ),
+
           Expanded(
             child: _NavItem(
               icon: Icons.lightbulb_outline,
-              label: "Innovation",
+              label: 'Innovation',
               selected: currentIndex == 2,
               onTap: () => onTap(2),
             ),
           ),
+
           Expanded(
             child: _NavItem(
               icon: Icons.calendar_month_outlined,
-              label: "Events",
+              label: 'Events',
               selected: currentIndex == 3,
               onTap: () => onTap(3),
             ),
           ),
+
           Expanded(
             child: _NavItem(
               icon: Icons.person_outline,
-              label: "Meetings",
+              label: 'Meetings',
               selected: currentIndex == 4,
               onTap: () => onTap(4),
             ),
@@ -90,29 +106,58 @@ class _NavItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.sizeOf(context).width;
+
+    final iconSize = screenWidth < 360
+        ? 23.0
+        : screenWidth < 600
+        ? 25.0
+        : 27.0;
+
+    final fontSize = screenWidth < 360
+        ? 10.0
+        : screenWidth < 600
+        ? 11.0
+        : 12.0;
+
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.zero,
         onTap: onTap,
         child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(
+            vertical: 6,
+            horizontal: 2,
+          ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Icon(
                 icon,
-                size: 28,
-                color: selected ? Colors.white : Colors.white70,
+                size: iconSize,
+                color: selected
+                    ? Colors.white
+                    : Colors.white70,
               ),
-              const SizedBox(height: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  fontWeight:
-                  selected ? FontWeight.w700 : FontWeight.w500,
-                  color: selected ? Colors.white : Colors.white70,
+
+              const SizedBox(height: 4),
+
+              Flexible(
+                child: Text(
+                  label,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: fontSize,
+                    fontWeight: selected
+                        ? FontWeight.w700
+                        : FontWeight.w500,
+                    color: selected
+                        ? Colors.white
+                        : Colors.white70,
+                  ),
                 ),
               ),
             ],

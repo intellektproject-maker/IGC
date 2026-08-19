@@ -12,6 +12,24 @@ class InnovateMockData {
   static const String registeredStudentName =
       'Arjun Prasad';
 
+  static const String registeredStudentId =
+      '87654';
+
+  static const String registeredEmail =
+      'uytre@gmail.com';
+
+  static const String registeredPhone =
+      '9876543234';
+
+  static const String registeredInstitution =
+      'hgfds';
+
+  static const String registeredCourse =
+      'ghfdsa';
+
+  static const String registeredYear =
+      '4th Year';
+
   // ==========================================================
   // INNOVATION POINTS
   // ==========================================================
@@ -23,21 +41,10 @@ class InnovateMockData {
   // ==========================================================
   // JOINED CHALLENGES
   // ==========================================================
-  //
-  // IMPORTANT:
-  // Each challenge has its own ID.
-  //
-  // This allows the same student to join:
-  //
-  // CH-001
-  // CH-002
-  // CH-003
-  //
-  // independently.
-  //
-  // ==========================================================
 
-  static final Set<String> joinedChallengeIds = {};
+  static final Set<String> joinedChallengeIds = {
+    'CH-001',
+  };
 
   // ==========================================================
   // CHALLENGES
@@ -54,11 +61,11 @@ class InnovateMockData {
       xp: 500,
       startDate: DateTime(2026, 8, 1),
       endDate: DateTime(2026, 8, 31),
-      participants: 245,
+      participants: 246,
       difficulty: 'Intermediate',
       image: '',
       featured: true,
-      joined: false,
+      joined: true,
     ),
 
     ChallengeModel(
@@ -107,11 +114,13 @@ class InnovateMockData {
       description:
       'Face recognition based attendance system.',
       domain: 'Artificial Intelligence',
-      status: 'under_review',
-      submittedDate:
-      DateTime(2026, 7, 15),
-      points: 0,
+      challengeId: 'CH-001',
+      challengeTitle: 'Smart Campus Innovation',
+      status: 'submitted',
+      submittedDate: DateTime(2026, 7, 15),
+      points: 10,
       shortlisted: true,
+      movedToBuild: true,
     ),
 
     IdeaModel(
@@ -120,11 +129,13 @@ class InnovateMockData {
       description:
       'Monitor water quality using ESP32 sensors.',
       domain: 'IoT',
+      challengeId: 'CH-001',
+      challengeTitle: 'Smart Campus Innovation',
       status: 'submitted',
-      submittedDate:
-      DateTime(2026, 7, 22),
-      points: 0,
+      submittedDate: DateTime(2026, 7, 22),
+      points: 10,
       shortlisted: false,
+      movedToBuild: false,
     ),
   ];
 
@@ -139,8 +150,7 @@ class InnovateMockData {
       description:
       '24-hour innovation hackathon.',
       venue: 'Innovation Center',
-      eventDate:
-      DateTime(2026, 8, 20),
+      eventDate: DateTime(2026, 8, 20),
       organizer: 'IGC',
       type: 'Hackathon',
       registered: true,
@@ -153,8 +163,7 @@ class InnovateMockData {
       description:
       'Showcase working prototypes to industry experts.',
       venue: 'Main Auditorium',
-      eventDate:
-      DateTime(2026, 9, 5),
+      eventDate: DateTime(2026, 9, 5),
       organizer: 'Innovation Cell',
       type: 'Expo',
       registered: false,
@@ -167,8 +176,7 @@ class InnovateMockData {
       description:
       'Pitch your startup idea to investors.',
       venue: 'Seminar Hall',
-      eventDate:
-      DateTime(2026, 9, 18),
+      eventDate: DateTime(2026, 9, 18),
       organizer: 'Startup Cell',
       type: 'Pitch',
       registered: false,

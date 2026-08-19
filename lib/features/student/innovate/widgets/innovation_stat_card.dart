@@ -1,18 +1,14 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/design_system/app_colors.dart';
-import '../../../../core/design_system/app_radius.dart';
-import '../../../../core/design_system/app_shadows.dart';
-import '../../../../core/design_system/app_spacing.dart';
-import '../../../../core/design_system/app_typography.dart';
 
-class InnovationStatCard extends StatelessWidget {
+class InnovateStatCard extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
   final Color iconColor;
 
-  const InnovationStatCard({
+  const InnovateStatCard({
     super.key,
     required this.title,
     required this.value,
@@ -22,59 +18,110 @@ class InnovationStatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(
-        AppSpacing.cardPadding,
-      ),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(
-          AppRadius.card,
-        ),
-        boxShadow: const [
-          AppShadows.small,
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final width = constraints.maxWidth;
 
-          CircleAvatar(
-            radius: 22,
-            backgroundColor: iconColor.withValues(
-              alpha: 0.12,
-            ),
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: 24,
-            ),
-          ),
+        // Responsive values
+        final iconContainerSize =
+        width < 140 ? 38.0 : 44.0;
 
-          const SizedBox(
-            height: AppSpacing.md,
-          ),
+        final iconSize =
+        width < 140 ? 19.0 : 22.0;
 
-          Text(
-            value,
-            style: AppTypography.headlineMedium.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
+        final valueFontSize =
+        width < 140 ? 20.0 : 22.0;
 
-          const SizedBox(
-            height: AppSpacing.xs,
-          ),
+        final titleFontSize =
+        width < 140 ? 12.0 : 13.0;
 
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            style: AppTypography.bodyMedium.copyWith(
-              color: AppColors.textSecondary,
-            ),
+        final verticalPadding =
+        width < 140 ? 10.0 : 14.0;
+
+        return Container(
+          width: double.infinity,
+          constraints: const BoxConstraints(
+            minHeight: 110,
+            maxHeight: 170,
           ),
-        ],
-      ),
+          padding: EdgeInsets.symmetric(
+            horizontal: width < 140 ? 8 : 12,
+            vertical: verticalPadding,
+          ),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // ==================================================
+              // ICON
+              // ==================================================
+
+              Container(
+                width: iconContainerSize,
+                height: iconContainerSize,
+                decoration: BoxDecoration(
+                  color: iconColor.withValues(alpha: 0.10),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  icon,
+                  size: iconSize,
+                  color: iconColor,
+                ),
+              ),
+
+              SizedBox(
+                height: width < 140 ? 8 : 10,
+              ),
+
+              // ==================================================
+              // VALUE
+              // ==================================================
+
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                child: Text(
+                  value,
+                  maxLines: 1,
+                  style: TextStyle(
+                    fontSize: valueFontSize,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.primary,
+                    height: 1.0,
+                  ),
+                ),
+              ),
+
+              SizedBox(
+                height: width < 140 ? 5 : 7,
+              ),
+
+              // ==================================================
+              // TITLE
+              // ==================================================
+
+              Flexible(
+                child: FittedBox(
+                  fit: BoxFit.scaleDown,
+                  child: Text(
+                    title,
+                    maxLines: 1,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: titleFontSize,
+                      fontWeight: FontWeight.w400,
+                      color: const Color(0xFF667085),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 }

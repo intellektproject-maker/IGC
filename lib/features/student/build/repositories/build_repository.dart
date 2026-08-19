@@ -7,9 +7,9 @@ import '../models/sprint_model.dart';
 class BuildRepository {
   const BuildRepository();
 
-  //=========================================================
-  // Featured Sprint
-  //=========================================================
+  // ==========================================================
+  // FEATURED SPRINT
+  // ==========================================================
 
   Future<SprintModel?> getFeaturedSprint() async {
     await Future.delayed(
@@ -25,92 +25,196 @@ class BuildRepository {
     }
   }
 
-  //=========================================================
-  // Product Sprints
-  //=========================================================
+  // ==========================================================
+  // SPRINTS
+  // ==========================================================
 
   Future<List<SprintModel>> getSprints() async {
     await Future.delayed(
       const Duration(milliseconds: 300),
     );
 
-    return BuildMockData.sprints;
+    return List<SprintModel>.from(
+      BuildMockData.sprints,
+    );
   }
 
-  //=========================================================
-  // Build Projects
-  //=========================================================
+  // ==========================================================
+  // PROJECTS
+  // ==========================================================
 
   Future<List<BuildProjectModel>> getProjects() async {
     await Future.delayed(
       const Duration(milliseconds: 300),
     );
 
-    return BuildMockData.projects;
+    return List<BuildProjectModel>.from(
+      BuildMockData.projects,
+    );
   }
 
-  //=========================================================
-  // Milestones
-  //=========================================================
+  // ==========================================================
+  // PROJECT BY IDEA
+  // ==========================================================
+
+  Future<BuildProjectModel?> getProjectByIdeaId(
+      String ideaId,
+      ) async {
+    await Future.delayed(
+      const Duration(milliseconds: 200),
+    );
+
+    try {
+      return BuildMockData.projects.firstWhere(
+            (project) => project.ideaId == ideaId,
+      );
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // ==========================================================
+  // CREATE PROJECT FROM IDEA
+  // ==========================================================
+
+  Future<BuildProjectModel> createProjectFromIdea({
+    required String ideaId,
+    required String challengeId,
+    required String challengeTitle,
+    required String title,
+    required String description,
+    required String technology,
+  }) async {
+    await Future.delayed(
+      const Duration(milliseconds: 500),
+    );
+
+    // --------------------------------------------------------
+    // PREVENT DUPLICATE PROJECT
+    // --------------------------------------------------------
+
+    final existingIndex =
+    BuildMockData.projects.indexWhere(
+          (project) => project.ideaId == ideaId,
+    );
+
+    if (existingIndex != -1) {
+      return BuildMockData.projects[existingIndex];
+    }
+
+    // --------------------------------------------------------
+    // CREATE PROJECT
+    // --------------------------------------------------------
+
+    final project = BuildProjectModel(
+      id:
+      'PROJ-${DateTime.now().millisecondsSinceEpoch}',
+
+      ideaId: ideaId,
+
+      challengeId: challengeId,
+
+      challengeTitle: challengeTitle,
+
+      title: title.trim(),
+
+      description: description.trim(),
+
+      technology: technology.trim(),
+
+      status: 'Not Started',
+
+      completion: 0,
+
+      githubUrl: '',
+
+      featured: false,
+
+      createdAt: DateTime.now(),
+    );
+
+    // --------------------------------------------------------
+    // SAVE
+    // --------------------------------------------------------
+
+    BuildMockData.projects.insert(
+      0,
+      project,
+    );
+
+    return project;
+  }
+
+  // ==========================================================
+  // MILESTONES
+  // ==========================================================
 
   Future<List<MilestoneModel>> getMilestones() async {
     await Future.delayed(
       const Duration(milliseconds: 300),
     );
 
-    return BuildMockData.milestones;
+    return List<MilestoneModel>.from(
+      BuildMockData.milestones,
+    );
   }
 
-  //=========================================================
-  // Build Events
-  //=========================================================
+  // ==========================================================
+  // EVENTS
+  // ==========================================================
 
   Future<List<BuildEventModel>> getEvents() async {
     await Future.delayed(
       const Duration(milliseconds: 300),
     );
 
-    return BuildMockData.events;
+    return List<BuildEventModel>.from(
+      BuildMockData.events,
+    );
   }
 
-  //=========================================================
-  // Dashboard Statistics
-  //=========================================================
+  // ==========================================================
+  // STATISTICS
+  // ==========================================================
 
   Future<Map<String, dynamic>> getStatistics() async {
     await Future.delayed(
       const Duration(milliseconds: 300),
     );
 
-    final sprints = BuildMockData.sprints;
-    final milestones = BuildMockData.milestones;
+    final projects = BuildMockData.projects;
 
-    final activeSprints = sprints
-        .where((sprint) => sprint.active)
+    final completedProjects = projects
+        .where(
+          (project) =>
+      project.completion >= 100,
+    )
         .length;
 
-    final completedMilestones = milestones
-        .where((milestone) => milestone.completed)
+    final activeProjects = projects
+        .where(
+          (project) =>
+      project.status.toLowerCase() !=
+          'completed',
+    )
         .length;
 
-    final totalXp = milestones.fold<int>(
+    final totalCompletion = projects.isEmpty
+        ? 0
+        : projects.fold<int>(
       0,
-          (sum, milestone) =>
-      milestone.completed
-          ? sum + milestone.xp
-          : sum,
-    );
-
-    final teamMembers = sprints.fold<int>(
-      0,
-          (sum, sprint) => sum + sprint.teamMembers,
-    );
+          (sum, project) =>
+      sum + project.completion,
+    ) ~/
+        projects.length;
 
     return {
-      "activeSprints": activeSprints,
-      "milestones": completedMilestones,
-      "xp": totalXp,
-      "teams": teamMembers,
+      'projects': projects.length,
+      'activeProjects': activeProjects,
+      'completedProjects': completedProjects,
+      'completion': totalCompletion,
+      'sprints': BuildMockData.sprints.length,
+      'milestones': BuildMockData.milestones.length,
     };
   }
 }

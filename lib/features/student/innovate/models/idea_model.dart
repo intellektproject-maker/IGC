@@ -4,19 +4,22 @@ class IdeaModel {
   final String description;
   final String domain;
 
-  /// draft
-  /// submitted
-  /// under_review
-  /// approved
-  /// rejected
   final String status;
 
   final DateTime submittedDate;
 
-  /// Innovation points awarded for this idea.
   final int points;
 
   final bool shortlisted;
+
+  /// True after the idea has been moved into Build.
+  final bool movedToBuild;
+
+  /// Challenge in which the idea was submitted.
+  final String challengeId;
+
+  /// Challenge title for displaying context.
+  final String challengeTitle;
 
   const IdeaModel({
     required this.id,
@@ -27,6 +30,9 @@ class IdeaModel {
     required this.submittedDate,
     required this.points,
     required this.shortlisted,
+    required this.movedToBuild,
+    required this.challengeId,
+    required this.challengeTitle,
   });
 
   factory IdeaModel.fromJson(
@@ -41,8 +47,16 @@ class IdeaModel {
       submittedDate: DateTime.parse(
         json['submittedDate'] as String,
       ),
-      points: json['points'] as int,
-      shortlisted: json['shortlisted'] as bool,
+      points:
+      (json['points'] as num).toInt(),
+      shortlisted:
+      json['shortlisted'] as bool,
+      movedToBuild:
+      json['movedToBuild'] as bool,
+      challengeId:
+      json['challengeId'] as String,
+      challengeTitle:
+      json['challengeTitle'] as String,
     );
   }
 
@@ -57,6 +71,9 @@ class IdeaModel {
       submittedDate.toIso8601String(),
       'points': points,
       'shortlisted': shortlisted,
+      'movedToBuild': movedToBuild,
+      'challengeId': challengeId,
+      'challengeTitle': challengeTitle,
     };
   }
 
@@ -69,11 +86,15 @@ class IdeaModel {
     DateTime? submittedDate,
     int? points,
     bool? shortlisted,
+    bool? movedToBuild,
+    String? challengeId,
+    String? challengeTitle,
   }) {
     return IdeaModel(
       id: id ?? this.id,
       title: title ?? this.title,
-      description: description ?? this.description,
+      description:
+      description ?? this.description,
       domain: domain ?? this.domain,
       status: status ?? this.status,
       submittedDate:
@@ -81,6 +102,12 @@ class IdeaModel {
       points: points ?? this.points,
       shortlisted:
       shortlisted ?? this.shortlisted,
+      movedToBuild:
+      movedToBuild ?? this.movedToBuild,
+      challengeId:
+      challengeId ?? this.challengeId,
+      challengeTitle:
+      challengeTitle ?? this.challengeTitle,
     );
   }
 }

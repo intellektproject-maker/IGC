@@ -1,20 +1,12 @@
 class EventModel {
   final String id;
-
   final String title;
-
   final String description;
-
   final String venue;
-
   final DateTime eventDate;
-
   final String organizer;
-
   final String type;
-
   final bool registered;
-
   final String image;
 
   const EventModel({
@@ -33,31 +25,33 @@ class EventModel {
       Map<String, dynamic> json,
       ) {
     return EventModel(
-      id: json["id"],
-      title: json["title"],
-      description: json["description"],
-      venue: json["venue"],
+      id: json['id'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String,
+      venue: json['venue'] as String,
       eventDate: DateTime.parse(
-        json["eventDate"],
+        json['eventDate'] as String,
       ),
-      organizer: json["organizer"],
-      type: json["type"],
-      registered: json["registered"],
-      image: json["image"],
+      organizer: json['organizer'] as String,
+      type: json['type'] as String,
+      registered:
+      json['registered'] as bool? ?? false,
+      image:
+      json['image'] as String? ?? '',
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "id": id,
-      "title": title,
-      "description": description,
-      "venue": venue,
-      "eventDate": eventDate.toIso8601String(),
-      "organizer": organizer,
-      "type": type,
-      "registered": registered,
-      "image": image,
+      'id': id,
+      'title': title,
+      'description': description,
+      'venue': venue,
+      'eventDate': eventDate.toIso8601String(),
+      'organizer': organizer,
+      'type': type,
+      'registered': registered,
+      'image': image,
     };
   }
 

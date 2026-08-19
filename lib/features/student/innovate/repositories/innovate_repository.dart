@@ -3,6 +3,9 @@ import '../models/challenge_model.dart';
 import '../models/event_model.dart';
 import '../models/idea_model.dart';
 
+import '../../build/repositories/build_repository.dart';
+import '../../build/models/build_project_model.dart';
+
 class InnovateRepository {
   const InnovateRepository();
 
@@ -28,13 +31,8 @@ class InnovateRepository {
     );
 
     try {
-      final challenge =
-      InnovateMockData.challenges.firstWhere(
+      return InnovateMockData.challenges.firstWhere(
             (challenge) => challenge.featured,
-      );
-
-      return _withJoinedState(
-        challenge,
       );
     } catch (_) {
       return null;
@@ -42,7 +40,7 @@ class InnovateRepository {
   }
 
   // ==========================================================
-  // ALL CHALLENGES
+  // CHALLENGES
   // ==========================================================
 
   Future<List<ChallengeModel>> getChallenges() async {
@@ -50,30 +48,96 @@ class InnovateRepository {
       const Duration(milliseconds: 300),
     );
 
-    return InnovateMockData.challenges
-        .map(
-          (challenge) =>
-          _withJoinedState(challenge),
-    )
-        .toList();
-  }
-
-  // ==========================================================
-  // APPLY JOINED STATE
-  // ==========================================================
-
-  ChallengeModel _withJoinedState(
-      ChallengeModel challenge,
-      ) {
-    return challenge.copyWith(
-      joined: InnovateMockData
-          .joinedChallengeIds
-          .contains(challenge.id),
+    return List<ChallengeModel>.from(
+      InnovateMockData.challenges,
     );
   }
 
   // ==========================================================
-  // MY IDEAS
+  // SUBMISSION STATUS
+  // ==========================================================
+
+  bool isSubmissionOpen(
+      String challengeId,
+      ) {
+    final index =
+    InnovateMockData.challenges.indexWhere(
+          (challenge) => challenge.id == challengeId,
+    );
+
+    if (index == -1) {
+      return false;
+    }
+
+    final challenge =
+    InnovateMockData.challenges[index];
+
+    return canSubmitToChallenge(
+      challengeId,
+    );
+  }
+
+  // ==========================================================
+  // CAN SUBMIT TO CHALLENGE
+  // ==========================================================
+
+  bool canSubmitToChallenge(
+      String challengeId,
+      ) {
+    final index =
+    InnovateMockData.challenges.indexWhere(
+          (challenge) => challenge.id == challengeId,
+    );
+
+    if (index == -1) {
+      return false;
+    }
+
+    final challenge =
+    InnovateMockData.challenges[index];
+
+    // --------------------------------------------------------
+    // MUST JOIN FIRST
+    // --------------------------------------------------------
+
+    if (!challenge.joined) {
+      return false;
+    }
+
+    // --------------------------------------------------------
+    // DEADLINE
+    // --------------------------------------------------------
+
+    final now = DateTime.now();
+
+    /*
+      Submission is allowed UNTIL the end date.
+
+      Example:
+      End date = 17 Aug 2026
+
+      Allowed:
+      17 Aug 2026 before 11:59:59 PM
+
+      Closed:
+      18 Aug 2026 onwards
+    */
+
+    final endDate = DateTime(
+      challenge.endDate.year,
+      challenge.endDate.month,
+      challenge.endDate.day,
+      23,
+      59,
+      59,
+      999,
+    );
+
+    return !now.isAfter(endDate);
+  }
+
+  // ==========================================================
+  // IDEAS
   // ==========================================================
 
   Future<List<IdeaModel>> getIdeas() async {
@@ -90,58 +154,155 @@ class InnovateRepository {
   // SUBMIT IDEA
   // ==========================================================
 
-  Future<IdeaModel> submitIdea({
+  Future<IdeaModel?> submitIdea({
+    required String challengeId,
     required String title,
     required String description,
     required String domain,
+    String? email,
+    String? phone,
   }) async {
     await Future.delayed(
       const Duration(milliseconds: 500),
     );
 
-    final cleanTitle =
-    title.trim();
+    // --------------------------------------------------------
+    // FIND CHALLENGE
+    // --------------------------------------------------------
 
-    final cleanDescription =
-    description.trim();
+    final challengeIndex =
+    InnovateMockData.challenges.indexWhere(
+          (challenge) => challenge.id == challengeId,
+    );
 
-    final cleanDomain =
-    domain.trim();
-
-    if (cleanTitle.isEmpty) {
-      throw Exception(
-        'Idea title is required.',
-      );
+    if (challengeIndex == -1) {
+      return null;
     }
 
-    if (cleanDescription.isEmpty) {
-      throw Exception(
-        'Idea description is required.',
-      );
+    final challenge =
+    InnovateMockData.challenges[challengeIndex];
+
+    // --------------------------------------------------------
+    // MUST JOIN
+    // --------------------------------------------------------
+
+    if (!challenge.joined) {
+      return null;
     }
 
-    if (cleanDomain.isEmpty) {
-      throw Exception(
-        'Idea domain is required.',
-      );
+    // --------------------------------------------------------
+    // DEADLINE CHECK
+    // --------------------------------------------------------
+
+    if (!canSubmitToChallenge(
+      challengeId,
+    )) {
+      return null;
     }
+
+    // --------------------------------------------------------
+    // VALIDATE TITLE
+    // --------------------------------------------------------
+
+    if (title.trim().isEmpty) {
+      return null;
+    }
+
+    // --------------------------------------------------------
+    // VALIDATE DESCRIPTION
+    // --------------------------------------------------------
+
+    if (description.trim().isEmpty) {
+      return null;
+    }
+
+    // --------------------------------------------------------
+    // VALIDATE DOMAIN
+    // --------------------------------------------------------
+
+    if (domain.trim().isEmpty) {
+      return null;
+    }
+
+    // --------------------------------------------------------
+    // EMAIL VALIDATION
+    // --------------------------------------------------------
+
+    if (email != null &&
+        email.trim().isNotEmpty) {
+      final emailRegex = RegExp(
+        r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
+      );
+
+      if (!emailRegex.hasMatch(
+        email.trim(),
+      )) {
+        return null;
+      }
+    }
+
+    // --------------------------------------------------------
+    // PHONE VALIDATION
+    // --------------------------------------------------------
+
+    if (phone != null &&
+        phone.trim().isNotEmpty) {
+      final phoneRegex = RegExp(
+        r'^[0-9]{10}$',
+      );
+
+      if (!phoneRegex.hasMatch(
+        phone.trim(),
+      )) {
+        return null;
+      }
+    }
+
+    // --------------------------------------------------------
+    // CREATE IDEA
+    // --------------------------------------------------------
 
     final idea = IdeaModel(
       id:
       'IDEA-${DateTime.now().millisecondsSinceEpoch}',
-      title: cleanTitle,
-      description: cleanDescription,
-      domain: cleanDomain,
+
+      title: title.trim(),
+
+      description: description.trim(),
+
+      domain: domain.trim(),
+
       status: 'under_review',
+
       submittedDate: DateTime.now(),
-      points: 0,
+
+      points:
+      InnovateMockData.ideaSubmissionPoints,
+
       shortlisted: false,
+
+      movedToBuild: false,
+
+      challengeId: challengeId,
+
+      challengeTitle: challenge.title,
     );
+
+    // --------------------------------------------------------
+    // SAVE IDEA
+    // --------------------------------------------------------
 
     InnovateMockData.ideas.insert(
       0,
       idea,
     );
+
+    // --------------------------------------------------------
+    // ADD POINTS
+    // --------------------------------------------------------
+
+    InnovateMockData.innovationPoints +=
+        InnovateMockData.ideaSubmissionPoints;
 
     return idea;
   }
@@ -164,48 +325,9 @@ class InnovateRepository {
       const Duration(milliseconds: 700),
     );
 
-    // ========================================================
-    // CLEAN VALUES
-    // ========================================================
-
-    final cleanName =
-    fullName.trim();
-
-    final cleanStudentId =
-    studentId.trim();
-
-    final cleanInstitution =
-    institution.trim();
-
-    final cleanCourse =
-    course.trim();
-
-    final cleanYear =
-    year.trim();
-
-    final cleanEmail =
-    email.trim();
-
-    final cleanPhone =
-    phone.trim();
-
-    // ========================================================
-    // NAME
-    // ========================================================
-
-    if (cleanName.isEmpty) {
-      return false;
-    }
-
-    if (!RegExp(
-      r'^[a-zA-Z ]+$',
-    ).hasMatch(cleanName)) {
-      return false;
-    }
-
-    // ========================================================
-    // IGC REGISTERED NAME
-    // ========================================================
+    // --------------------------------------------------------
+    // NAME VALIDATION
+    // --------------------------------------------------------
 
     final registeredName =
     InnovateMockData
@@ -213,120 +335,69 @@ class InnovateRepository {
         .trim()
         .toLowerCase();
 
-    if (cleanName.toLowerCase() !=
-        registeredName) {
+    final enteredName =
+    fullName.trim().toLowerCase();
+
+    if (enteredName != registeredName) {
       return false;
     }
 
-    // ========================================================
+    // --------------------------------------------------------
     // STUDENT ID
-    // ========================================================
+    // --------------------------------------------------------
 
-    if (cleanStudentId.isEmpty) {
+    if (studentId.trim().isEmpty) {
       return false;
     }
 
-    if (!RegExp(
-      r'^[a-zA-Z0-9]+$',
-    ).hasMatch(cleanStudentId)) {
-      return false;
-    }
-
-    // ========================================================
-    // INSTITUTION
-    // ========================================================
-
-    if (cleanInstitution.isEmpty) {
-      return false;
-    }
-
-    if (!RegExp(
-      r'^[a-zA-Z ]+$',
-    ).hasMatch(cleanInstitution)) {
-      return false;
-    }
-
-    // ========================================================
-    // COURSE
-    // ========================================================
-
-    if (cleanCourse.isEmpty) {
-      return false;
-    }
-
-    if (!RegExp(
-      r'^[a-zA-Z ]+$',
-    ).hasMatch(cleanCourse)) {
-      return false;
-    }
-
-    // ========================================================
-    // YEAR
-    // ========================================================
-
-    const validYears = [
-      '1st Year',
-      '2nd Year',
-      '3rd Year',
-      '4th Year',
-      '5th Year',
-    ];
-
-    if (!validYears.contains(
-      cleanYear,
-    )) {
-      return false;
-    }
-
-    // ========================================================
+    // --------------------------------------------------------
     // EMAIL
-    // ========================================================
-
-    if (cleanEmail.isEmpty) {
-      return false;
-    }
+    // --------------------------------------------------------
 
     final emailRegex = RegExp(
-      r'^[a-zA-Z0-9._%+-]+@'
-      r'[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+      r'^[^@\s]+@[^@\s]+\.[^@\s]+$',
     );
 
     if (!emailRegex.hasMatch(
-      cleanEmail,
+      email.trim(),
     )) {
       return false;
     }
 
-    // ========================================================
+    // --------------------------------------------------------
     // PHONE
-    // ========================================================
+    // --------------------------------------------------------
 
-    if (!RegExp(
-      r'^[6-9][0-9]{9}$',
-    ).hasMatch(cleanPhone)) {
+    final phoneRegex = RegExp(
+      r'^[0-9]{10}$',
+    );
+
+    if (!phoneRegex.hasMatch(
+      phone.trim(),
+    )) {
       return false;
     }
 
-    // ========================================================
+    // --------------------------------------------------------
     // FIND CHALLENGE
-    // ========================================================
+    // --------------------------------------------------------
+
+    final index =
+    InnovateMockData.challenges.indexWhere(
+          (challenge) =>
+      challenge.id == challengeId,
+    );
+
+    if (index == -1) {
+      return false;
+    }
 
     final challenge =
-        InnovateMockData.challenges
-            .where(
-              (item) =>
-          item.id ==
-              challengeId,
-        )
-            .firstOrNull;
+    InnovateMockData.challenges[index];
 
-    if (challenge == null) {
-      return false;
-    }
-
-    // ========================================================
-    // ALREADY JOINED THIS CHALLENGE
-    // ========================================================
+    // --------------------------------------------------------
+    // ALREADY JOINED
+    // --------------------------------------------------------
 
     if (InnovateMockData
         .joinedChallengeIds
@@ -334,33 +405,19 @@ class InnovateRepository {
       return false;
     }
 
-    // ========================================================
-    // JOIN THIS CHALLENGE
-    // ========================================================
+    // --------------------------------------------------------
+    // REGISTER
+    // --------------------------------------------------------
 
-    InnovateMockData
-        .joinedChallengeIds
+    InnovateMockData.joinedChallengeIds
         .add(challengeId);
 
-    // ========================================================
-    // UPDATE PARTICIPANT COUNT
-    // ========================================================
-
-    final index =
-    InnovateMockData.challenges
-        .indexWhere(
-          (item) =>
-      item.id ==
-          challengeId,
-    );
-
-    if (index != -1) {
-      InnovateMockData.challenges[index] =
-          challenge.copyWith(
-            participants:
-            challenge.participants + 1,
-          );
-    }
+    InnovateMockData.challenges[index] =
+        challenge.copyWith(
+          joined: true,
+          participants:
+          challenge.participants + 1,
+        );
 
     return true;
   }
@@ -380,6 +437,86 @@ class InnovateRepository {
   }
 
   // ==========================================================
+  // MOVE SHORTLISTED IDEA TO BUILD
+  // ==========================================================
+
+  Future<BuildProjectModel?> moveIdeaToBuild({
+    required String ideaId,
+  }) async {
+    final ideaIndex =
+    InnovateMockData.ideas.indexWhere(
+          (idea) => idea.id == ideaId,
+    );
+
+    if (ideaIndex == -1) {
+      return null;
+    }
+
+    final idea =
+    InnovateMockData.ideas[ideaIndex];
+
+    // --------------------------------------------------------
+    // ONLY SHORTLISTED IDEAS
+    // --------------------------------------------------------
+
+    if (!idea.shortlisted) {
+      return null;
+    }
+
+    // --------------------------------------------------------
+    // ALREADY MOVED
+    // --------------------------------------------------------
+
+    if (idea.movedToBuild) {
+      final buildRepository =
+      const BuildRepository();
+
+      return buildRepository.getProjectByIdeaId(
+        ideaId,
+      );
+    }
+
+    // --------------------------------------------------------
+    // GET CHALLENGE INFORMATION
+    // --------------------------------------------------------
+
+    String challengeId =
+        idea.challengeId;
+
+    String challengeTitle =
+        idea.challengeTitle;
+
+    // --------------------------------------------------------
+    // CREATE BUILD PROJECT
+    // --------------------------------------------------------
+
+    final buildRepository =
+    const BuildRepository();
+
+    final project =
+    await buildRepository
+        .createProjectFromIdea(
+      ideaId: idea.id,
+      challengeId: challengeId,
+      challengeTitle: challengeTitle,
+      title: idea.title,
+      description: idea.description,
+      technology: idea.domain,
+    );
+
+    // --------------------------------------------------------
+    // UPDATE IDEA
+    // --------------------------------------------------------
+
+    InnovateMockData.ideas[ideaIndex] =
+        idea.copyWith(
+          movedToBuild: true,
+        );
+
+    return project;
+  }
+
+  // ==========================================================
   // STATISTICS
   // ==========================================================
 
@@ -389,46 +526,56 @@ class InnovateRepository {
       const Duration(milliseconds: 300),
     );
 
+    final challenges =
+        InnovateMockData.challenges;
+
     final ideas =
         InnovateMockData.ideas;
 
-    final joinedCount =
-        InnovateMockData
-            .joinedChallengeIds
+    final joined =
+        challenges
+            .where(
+              (challenge) =>
+          challenge.joined,
+        )
             .length;
 
-    // Calculate XP only from challenges
-    // actually joined by this student.
     final xp =
-    InnovateMockData.challenges
+    challenges
         .where(
           (challenge) =>
-          InnovateMockData
-              .joinedChallengeIds
-              .contains(
-            challenge.id,
-          ),
+      challenge.joined,
     )
         .fold<int>(
       0,
-          (sum, challenge) =>
-      sum + challenge.xp,
+          (sum, item) =>
+      sum + item.xp,
     );
 
     final shortlisted =
-        ideas.where(
+        ideas
+            .where(
               (idea) =>
           idea.shortlisted,
-        ).length;
+        )
+            .length;
+
+    final movedToBuild =
+        ideas
+            .where(
+              (idea) =>
+          idea.movedToBuild,
+        )
+            .length;
 
     return {
-      'joined': joinedCount,
+      'joined': joined,
       'ideas': ideas.length,
       'xp': xp,
       'shortlisted': shortlisted,
+      'movedToBuild': movedToBuild,
       'points':
-      InnovateMockData
-          .innovationPoints,
+      InnovateMockData.innovationPoints,
     };
   }
 }

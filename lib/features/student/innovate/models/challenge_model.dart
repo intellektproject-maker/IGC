@@ -5,11 +5,15 @@ class ChallengeModel {
   final String category;
   final String status;
   final int xp;
+
   final DateTime startDate;
   final DateTime endDate;
+
   final int participants;
   final String difficulty;
+
   final String image;
+
   final bool featured;
   final bool joined;
 
@@ -38,18 +42,23 @@ class ChallengeModel {
       description: json['description'] as String,
       category: json['category'] as String,
       status: json['status'] as String,
-      xp: json['xp'] as int,
+      xp: (json['xp'] as num).toInt(),
       startDate: DateTime.parse(
         json['startDate'] as String,
       ),
       endDate: DateTime.parse(
         json['endDate'] as String,
       ),
-      participants: json['participants'] as int,
-      difficulty: json['difficulty'] as String,
-      image: json['image'] as String,
-      featured: json['featured'] as bool,
-      joined: json['joined'] as bool,
+      participants:
+      (json['participants'] as num?)?.toInt() ?? 0,
+      difficulty:
+      json['difficulty'] as String? ?? '',
+      image:
+      json['image'] as String? ?? '',
+      featured:
+      json['featured'] as bool? ?? false,
+      joined:
+      json['joined'] as bool? ?? false,
     );
   }
 
